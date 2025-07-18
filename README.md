@@ -23,9 +23,9 @@ Moreover, you can visit our [Demo Page](https://aaronz345.github.io/ISDramaDemo)
 
 ## TODO List
 
-✅ Release the evaluation code.
-
 ✅ Release the full dataset.
+
+🔲 Release the evaluation code.
 
 🔲 Release the main model code.
 
