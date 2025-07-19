@@ -25,7 +25,7 @@ Moreover, you can visit our [Demo Page](https://aaronz345.github.io/ISDramaDemo)
 
 ✅ Release the full dataset.
 
-🔲 Release the evaluation code.
+✅ Release the evaluation code.
 
 🔲 Release the main model code.
 
@@ -46,6 +46,97 @@ Click [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Fac
 Our dataset is organized hierarchically. 
 
 Each top-level folder contains a set of dramas. Each folder contains a subfolder with cut WAV files, an MP4 video file, and a JSON file containing all annotation information.
+
+## Evaluation of ISDrama
+
+> The evaluation process is based on the code and models of "BAT: Learning to Reason about Spatial Sounds with Large Language Models" .
+
+### Dependencies
+
+A suitable [conda](https://conda.io/) environment named `isdrama_eva` can be created
+and activated with:
+
+```bash
+conda env create -f environment.yml
+bash timm_patch/patch.sh
+conda activate isdrama_eva
+```
+
+## Preparation
+
+### Checkpoint Preparation
+
+Please download the finetuned `BAT` encoder [checkpoint](https://huggingface.co/datasets/zhisheng01/SpatialAudio/blob/main/SpatialAST/finetuned.pth) and place it at:
+
+```bash
+./evaluation/ckpt/finetuned.pth
+```
+Make sure the path exists (create the `ckpt`` directory if necessary).
+
+### Data Preparation
+
+For evaluation, you must prepare paired ground‑truth audio and generated audio.
+Place them respectively in:
+
+```bash
+./evaluation/data/gt
+./evaluation/data/infer
+```
+The expected directory layout is:
+
+```yaml
+.
+├── gt
+│   ├── 0000.wav
+│   ├── 0001.wav
+│   ├── 0002.wav
+│   └── 0003.wav
+└── infer
+    ├── 0000.wav
+    ├── 0001.wav
+    ├── 0002.wav
+    └── 0003.wav
+```
+
+Important:
+
+- The files inside gt and infer must correspond one‑to‑one.
+- Filenames and counts must match exactly (e.g., `gt/0002.wav` pairs with `infer/0002.wav`).
+- Ensure sampling rates and channel configurations are consistent if required by downstream metrics.
+
+## Metrics
+
+### Semantic & Acoustic Metrics
+- **Character Error Rate (CER)**: Assesses transcript/content accuracy.
+- **Cosine Similarity (SIM)**: Measures speaker timbre similarity between the generated audio and the prompt/reference audio (e.g., via speaker embeddings).
+- **F0 Frame Error (FFE)**: Evaluates prosody fidelity by comparing voiced/unvoiced decisions and pitch (F0) frames.
+
+### Spatial Metrics
+- **IPD MAE**: Mean Absolute Error between ground‑truth and generated Interaural Phase Differences.
+- **ILD MAE**: Mean Absolute Error between ground‑truth and generated Interaural Level Differences.
+- **Angle Cosine Similarity (ANG Cos)**: Cosine similarity between ground‑truth and generated direction (azimuth / elevation) angle embeddings.
+- **Distance Cosine Similarity (Dis Cos)**: Cosine similarity between ground‑truth and generated distance embeddings.
+
+> **Note:** Cosine‑based spatial scores are in the range \[-1, 1\], with higher values indicating closer alignment of spatial embeddings.
+
+## Running the Evaluation
+
+Run the following script to perform the evaluation pipeline:
+
+```bash
+cd evaluation
+bash ./evaluate/eval.sh
+```
+
+The script evaluate/eval.sh executes the following three stages:
+
+1. Extract angle and distance embeddings using the BAT encoder.
+
+2. Extract IPD & ILD features from paired ground‑truth and generated stereo audio.
+
+3. Compute metrics: MAE (for IPD / ILD) and cosine similarities (for angle and distance).
+
+> Ensure that ground‑truth and generated audio files are correctly paired and preprocessed before running the script.
 
 ## Citations ##
 
