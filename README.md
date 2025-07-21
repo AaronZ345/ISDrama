@@ -6,6 +6,7 @@ Dataset and evaluation code of [ISDrama (ACMMM 2025)](https://arxiv.org/abs/2504
 
 [![arXiv](https://img.shields.io/badge/arXiv-Paper-<COLOR>.svg)](https://arxiv.org/abs/2504.20630) 
 [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue?label=Dataset)](https://huggingface.co/datasets/AaronZ345/MRSDrama)
+[![zhihu](https://img.shields.io/badge/-知乎-000000?logo=zhihu&logoColor=0084FF)](https://zhuanlan.zhihu.com/p/1930597017840779306)
 [![GitHub Stars](https://img.shields.io/github/stars/AaronZ345/ISDrama?style=social)](https://github.com/AaronZ345/ISDrama)
 
 We construct MRSDrama, the first multimodal recorded spatial drama dataset, containing binaural drama audios, scripts, videos, geometric poses, and textual prompts.
