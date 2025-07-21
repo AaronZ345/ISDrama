@@ -2,7 +2,7 @@
 
 #### Yu Zhang*, Wenxiang Guo*, Changhao Pan*, Zhiyuan Zhu*, Tao Jin, Zhou Zhao | Zhejiang University
 
-Dataset and evaluation code of [ISDrama (ACMMM 2025)](https://arxiv.org/abs/2504.20630): Immersive Spatial Drama Generation through Multimodal Prompting.
+Dataset and evaluation code of [ISDrama (ACM-MM 2025)](https://arxiv.org/abs/2504.20630): Immersive Spatial Drama Generation through Multimodal Prompting.
 
 [![arXiv](https://img.shields.io/badge/arXiv-Paper-<COLOR>.svg)](https://arxiv.org/abs/2504.20630) 
 [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue?label=Dataset)](https://huggingface.co/datasets/AaronZ345/MRSDrama)
