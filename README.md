@@ -24,14 +24,6 @@ Moreover, you can visit our [Demo Page](https://aaronz345.github.io/ISDramaDemo)
 - 2025.07: We released the full dataset of MRSDrama!
 - 2025.07: ISDrama is accepted by ACMMM 2025!
 
-## TODO List
-
-✅ Release the full dataset.
-
-✅ Release the evaluation code.
-
-🔲 Release the main model code.
-
 ## Key Features
 
 - We develop MRSDrama, the first **multimodal recorded spatial drama dataset**, accompanying videos, scripts, alignments, positions, and textual prompts.
