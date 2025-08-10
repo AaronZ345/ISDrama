@@ -9,6 +9,7 @@ Dataset and evaluation code of [ISDrama (ACM-MM 2025)](https://arxiv.org/abs/250
 [![weixin](https://img.shields.io/badge/-WeChat@语音之家-000000?logo=wechat&logoColor=07C160)](https://mp.weixin.qq.com/s/jrKT16zH115ZDYxa0b492w)
 [![weixin](https://img.shields.io/badge/-WeChat@PaperWeekly-000000?logo=wechat&logoColor=07C160)](https://mp.weixin.qq.com/s/ZIC8rHDkwsKwcBwEi4v4DQ)
 [![zhihu](https://img.shields.io/badge/-知乎-000000?logo=zhihu&logoColor=0084FF)](https://zhuanlan.zhihu.com/p/1930597017840779306)
+[![Google Drive](https://img.shields.io/badge/Google%20Drive-Link-blue?logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1ALpnOD4b_zgn8GSu4aS-cjdDK8vY6Lyy?usp=sharing)
 [![GitHub Stars](https://img.shields.io/github/stars/AaronZ345/ISDrama?style=social)](https://github.com/AaronZ345/ISDrama)
 
 We construct MRSDrama, the first multimodal recorded spatial drama dataset, containing binaural drama audios, scripts, videos, geometric poses, and textual prompts.
@@ -33,6 +34,8 @@ Moreover, you can visit our [Demo Page](https://aaronz345.github.io/ISDramaDemo)
 ### Where to download
 
 Click [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue?label=Dataset)](https://huggingface.co/datasets/AaronZ345/MRSDrama) to access our **full dataset** (videos, scripts, alignments, positions, and textual prompts) on Hugging Face **for free**! Hope our data is helpful for your research.
+
+Besides, we also provide our dataset on [![Google Drive](https://img.shields.io/badge/Google%20Drive-Link-blue?logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1ALpnOD4b_zgn8GSu4aS-cjdDK8vY6Lyy?usp=sharing).
 
 **Please note that, if you are using MRSDrama, it means that you have accepted the terms of [license](https://github.com/AaronZ345/ISDrama/blob/master/dataset_license.md).**
 
