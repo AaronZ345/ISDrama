@@ -32,6 +32,8 @@ Moreover, you can visit our [Demo Page](https://aaronz345.github.io/ISDramaDemo)
 - We introduce ISDrama, the first **immersive spatial drama generation model through multimodal prompting**. We design the **Multimodal Pose Encoder** to extract pose from multimodal inputs, while the **Immersive Drama Transformer** produces binaural speech.
 - Experimental results show that ISDrama outperforms baseline models on objective and subjective metrics.
 
+## Dataset
+
 ### Where to download
 
 Click [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue?label=Dataset)](https://huggingface.co/datasets/AaronZ345/MRSDrama) to access our **full dataset** (videos, scripts, alignments, positions, and textual prompts) on Hugging Face **for free**! Hope our data is helpful for your research.
