@@ -32,7 +32,16 @@ Moreover, you can visit our [Demo Page](https://aaronz345.github.io/ISDramaDemo)
 - We introduce ISDrama, the first **immersive spatial drama generation model through multimodal prompting**. We design the **Multimodal Pose Encoder** to extract pose from multimodal inputs, while the **Immersive Drama Transformer** produces binaural speech.
 - Experimental results show that ISDrama outperforms baseline models on objective and subjective metrics.
 
-## Dataset
+## Training datasets
+
+MRSDrama and MRSAudio are both publicly released training data resources for spatial audio generation and understanding:
+
+| Dataset | Training data | Download |
+| --- | --- | --- |
+| MRSDrama | Recorded binaural drama, scripts, video, geometric poses, and textual prompts | [Hugging Face](https://huggingface.co/datasets/AaronZ345/MRSDrama) |
+| MRSAudio | MRSLife, MRSSpeech, MRSSing, and MRSMusic, with spatial recordings and multimodal annotations | [Hugging Face](https://huggingface.co/datasets/MRSAudio/MRSAudio) · [Project](https://mrsaudio.github.io) |
+
+Prepare the selected dataset for your model's training pipeline and follow its own data card and license. This repository contains the ISDrama evaluation tools; the paired audio directories used by those tools are described separately below.
 
 ### Where to download
 
@@ -60,8 +69,8 @@ and activated with:
 
 ```bash
 conda env create -f environment.yml
-bash timm_patch/patch.sh
 conda activate isdrama_eva
+bash timm_patch/patch.sh
 ```
 
 ## Preparation
@@ -71,9 +80,10 @@ conda activate isdrama_eva
 Please download the finetuned `BAT` encoder [checkpoint](https://huggingface.co/datasets/zhisheng01/SpatialAudio/blob/main/SpatialAST/finetuned.pth) and place it at:
 
 ```bash
-./evaluation/ckpt/finetuned.pth
+./ckpt/finetuned.pth
 ```
-Make sure the path exists (create the `ckpt`` directory if necessary).
+Make sure the path exists (create the `ckpt` directory if necessary).
+The evaluator verifies the published checkpoint's SHA-256 before deserializing a private copy. Custom or modified checkpoint files are rejected.
 
 ### Data Preparation
 
@@ -81,8 +91,8 @@ For evaluation, you must prepare paired ground‑truth audio and generated audio
 Place them respectively in:
 
 ```bash
-./evaluation/data/gt
-./evaluation/data/infer
+./data/gt
+./data/infer
 ```
 The expected directory layout is:
 
@@ -126,8 +136,8 @@ Important:
 Run the following script to perform the evaluation pipeline:
 
 ```bash
-cd evaluation
-bash ./evaluate/eval.sh
+bash evaluate/eval.sh --gt-dir data/gt --pred-dir data/infer \
+  --checkpoint ckpt/finetuned.pth --output-dir outputs/run-1
 ```
 
 The script evaluate/eval.sh executes the following three stages:
@@ -138,7 +148,25 @@ The script evaluate/eval.sh executes the following three stages:
 
 3. Compute metrics: MAE (for IPD / ILD) and cosine similarities (for angle and distance).
 
-> Ensure that ground‑truth and generated audio files are correctly paired and preprocessed before running the script.
+The runner requires matching, nonempty WAV filename sets and an output directory that does not already exist. It reserves that directory before extraction and removes its partial output if a stage fails. Use `--device cpu` for CPU embedding extraction, or set `CUDA_VISIBLE_DEVICES` before the command to select an existing GPU. The BAT preprocessing profile is fixed by the encoder; it does not select or load a training dataset.
+
+To calculate IPD and ILD without the BAT checkpoint:
+
+```bash
+bash evaluate/eval.sh --gt-dir data/gt --pred-dir data/infer \
+  --output-dir outputs/ipd-ild-run-1 --skip-embeddings
+```
+
+The default `--mae-normalization mean` computes the mean absolute error once over aligned time-frequency elements, then multiplies the printed score by 100. It corrects the previous extra division by frame count. Scores from this version should be labeled `mean`; use `--mae-normalization legacy` to reproduce the former normalization when comparing historical runs. Both modes retain the existing feature extraction and alignment convention.
+
+Existing features can be evaluated independently:
+
+New feature files contain numeric arrays with shape `(2, time, mel)`, ordered as IPD then ILD. Regenerate older pickled dictionary feature files with the updated extractor; object arrays are no longer loaded. All requested metrics must cover the same audio items.
+
+```bash
+python evaluate/evaluate.py --gt-dir outputs/run-1/gt/npy \
+  --pred-dir outputs/run-1/infer/npy --mae-normalization mean
+```
 
 ## Citations ##
 

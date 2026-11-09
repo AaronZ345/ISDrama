@@ -24,6 +24,7 @@ import timm
 import utils.lr_decay as lrd
 import utils.misc as misc
 from utils.misc import NativeScalerWithGradNormCount as NativeScaler
+from utils.checkpoint import load_bat_checkpoint
 from data.dataset import DistributedSamplerWrapper, DistributedWeightedSampler, BinauralEvaDataset
 
 import spatial_eva
@@ -277,7 +278,7 @@ def main(args):
 
     #if args.finetune and not args.eval:
     if args.finetune:
-        checkpoint = torch.load(args.finetune, map_location='cpu')
+        checkpoint = load_bat_checkpoint(args.finetune)
         print("Load pre-trained checkpoint from: %s" % args.finetune)
         checkpoint_model = checkpoint['model']
         state_dict = model.state_dict()

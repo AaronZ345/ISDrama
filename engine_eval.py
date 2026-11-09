@@ -22,6 +22,7 @@ import utils.misc as misc
 import utils.lr_sched as lr_sched
 from utils.stat import calculate_stats, concat_all_gather
 import os
+from pathlib import Path
 
 def train_one_epoch(
         model: torch.nn.Module, criterion: torch.nn.Module,
@@ -117,10 +118,10 @@ def evaluate(data_loader, model, device, dist_eval=False, output_dir=''):
         quality_pred, spatial_pred, localization_pred, overall_pred, distance_pred, azimuth_pred, elevation_pred = model(waveforms)
         
         for i in range(len(audio_paths)):
-            if 'testset' in audio_paths[i]:
-                item_name = audio_paths[i].split('/')[-2]
+            if getattr(data_loader.dataset, 'nested_layout', False):
+                item_name = Path(audio_paths[i]).parent.name
             else:
-                item_name = audio_paths[i].split('/')[-1][:-4]
+                item_name = Path(audio_paths[i]).stem
 
             dis_npy_path = os.path.join(output_dir, item_name+'_dis.npy')
             azi_npy_path = os.path.join(output_dir, item_name+'_azi.npy')

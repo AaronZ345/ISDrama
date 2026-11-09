@@ -12,5 +12,11 @@ dependencies:
       - torchaudio==2.0.2
       - torchvision==0.15.2
       - timm==0.3.2
+      - numpy==1.24.4
+      - scipy==1.10.1
+      - librosa==0.10.1
+      - soundfile
+      - tqdm
+      - setuptools==69.5.1
       - tensorboard
       - h5py
