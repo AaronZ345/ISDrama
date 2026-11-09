@@ -1,9 +1,9 @@
 <h1>ISDrama: Immersive Spatial Drama Generation through Multimodal Prompting<br>
-  <a href="https://acmmm2025.org/"><img src="assets/readme/venue-mark.png" width="24" alt="" /><img src="assets/readme/link-venue.svg" alt="ACM Multimedia 2025" /></a>
+  <a href="https://acmmm2025.org/"><img src="assets/readme/link-venue.svg" alt="ACM Multimedia 2025" /></a>
 </h1>
 
 <p>
-  <strong><a href="https://aaronz345.github.io/">Yu&nbsp;Zhang</a></strong>*, Wenxiang&nbsp;Guo*, Changhao&nbsp;Pan*, Zhiyuan&nbsp;Zhu*, Tao&nbsp;Jin, Zhou&nbsp;Zhao&nbsp;·&nbsp;<img src="https://www.zju.edu.cn/_upload/article/images/c3/98/1fb1d281492eb477a098ef7a2901/05966b26-ab45-470d-94c1-99b1e02d12f4.png" width="38" alt="" />&nbsp;<em>Zhejiang&nbsp;University</em>
+  <strong><a href="https://aaronz345.github.io/">Yu&nbsp;Zhang</a></strong>*, Wenxiang&nbsp;Guo*, Changhao&nbsp;Pan*, Zhiyuan&nbsp;Zhu*, Tao&nbsp;Jin, Zhou&nbsp;Zhao&ensp;<img src="assets/readme/affiliation-zju.svg" align="absmiddle" alt="Zhejiang University" />
 </p>
 
 <p>
@@ -23,7 +23,9 @@ For training, see the [datasets](#training-datasets) and [data format](docs/data
 
 ## ![](assets/readme/section-history.svg) News
 
-- **2025.07** · Released MRSDrama data and evaluation code. ISDrama was accepted to ACM Multimedia 2025.
+- **2025.07** · Released the evaluation code.
+- **2025.07** · Released the full MRSDrama dataset.
+- **2025.07** · ISDrama was accepted to ACM Multimedia 2025.
 
 ## ![](assets/readme/section-quick-start.svg) Quick start
 
@@ -73,7 +75,7 @@ See the [evaluation guide](docs/evaluation.md) for metric definitions, numeric f
 | Dataset | Training resources | Access |
 | --- | --- | --- |
 | MRSDrama | Binaural drama, scripts, video, geometric poses, and text prompts | [Hugging Face](https://huggingface.co/datasets/AaronZ345/MRSDrama) · [Google Drive](https://drive.google.com/drive/folders/1ALpnOD4b_zgn8GSu4aS-cjdDK8vY6Lyy?usp=sharing) |
-| MRSAudio | MRSLife, MRSSpeech, MRSSing, and MRSMusic with spatial recordings and multimodal annotations | [Hugging Face](https://huggingface.co/datasets/MRSAudio/MRSAudio) · [Project](https://mrsaudio.github.io) |
+| MRSAudio | MRSLife, MRSSpeech, MRSSing, and MRSMusic with spatial recordings and multimodal annotations | [Hugging Face](https://huggingface.co/datasets/MRSAudio/MRSAudio) |
 
 Prepare either dataset for your model's training pipeline and follow its own data card and license. The paired ground-truth/generated directories above are evaluation inputs. The encoder's BAT preprocessing profile does not select a training dataset.
 
