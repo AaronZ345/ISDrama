@@ -1,16 +1,22 @@
-<div align="center">
+# ISDrama: Immersive Spatial Drama Generation through Multimodal Prompting
 
-# ISDrama
+Yu Zhang\*, Wenxiang Guo\*, Changhao Pan\*, Zhiyuan Zhu\*, Tao Jin, Zhou Zhao\
+*Zhejiang University*
 
-**Immersive spatial drama generation through multimodal prompting**
+[ACM Multimedia 2025](https://acmmm2025.org/)
 
-[ACM Multimedia 2025](https://arxiv.org/abs/2504.20630)
+[![arXiv](https://img.shields.io/badge/arXiv-Paper-b31b1b.svg)](https://arxiv.org/abs/2504.20630)
+[![Demo](https://img.shields.io/badge/🚀%20Demo%20Page-blue)](https://aaronz345.github.io/ISDramaDemo)
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue?label=Dataset)](https://huggingface.co/datasets/AaronZ345/MRSDrama)
+[![Google Drive](https://img.shields.io/badge/Google%20Drive-Link-blue?logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1ALpnOD4b_zgn8GSu4aS-cjdDK8vY6Lyy?usp=sharing)
+[![GitHub Stars](https://img.shields.io/github/stars/AaronZ345/ISDrama?style=social&label=GitHub+Stars)](https://github.com/AaronZ345/ISDrama)
 
-[![Paper](https://img.shields.io/badge/Paper-arXiv-b31b1b?style=flat-square)](https://arxiv.org/abs/2504.20630) [![Dataset](https://img.shields.io/badge/Dataset-Hugging%20Face-ffd21e?style=flat-square)](https://huggingface.co/datasets/AaronZ345/MRSDrama) [![Demo](https://img.shields.io/badge/Demo-Samples-2563eb?style=flat-square)](https://aaronz345.github.io/ISDramaDemo) [![Stars](https://img.shields.io/github/stars/AaronZ345/ISDrama?style=flat-square)](https://github.com/AaronZ345/ISDrama)
+[![语音之家](https://img.shields.io/badge/-WeChat@语音之家-000000?logo=wechat&logoColor=07C160)](https://mp.weixin.qq.com/s/jrKT16zH115ZDYxa0b492w)
+[![PaperWeekly](https://img.shields.io/badge/-WeChat@PaperWeekly-000000?logo=wechat&logoColor=07C160)](https://mp.weixin.qq.com/s/ZIC8rHDkwsKwcBwEi4v4DQ)
+[![知乎](https://img.shields.io/badge/-知乎-000000?logo=zhihu&logoColor=0084FF)](https://zhuanlan.zhihu.com/p/1930597017840779306)
 
-[Quick start](#quick-start) · [Training datasets](#training-datasets) · [Data format](docs/data-format.md) · [Evaluation](docs/evaluation.md) · [Citation](#citations)
-
-</div>
+> **Start here** · [Quick start](#quick-start) · [Training datasets](#training-datasets)\
+> **Reference** · [Data format](docs/data-format.md) · [Evaluation](docs/evaluation.md) · [Citation](#citations)
 
 ISDrama introduces multimodal spatial drama generation and the MRSDrama recorded dataset. **This repository provides dataset access and spatial evaluation tools.** MRSDrama and MRSAudio are publicly released training resources for spatial audio generation and understanding.
 
@@ -20,14 +26,6 @@ ISDrama introduces multimodal spatial drama generation and the MRSDrama recorded
 | Evaluation | Paired spatial audio feature extraction and metrics |
 | Encoder | Published BAT checkpoint, verified before loading |
 | Runtime | Python 3.8 to 3.10; PyTorch 2.0.1; CPU or an existing CUDA device |
-
-```mermaid
-flowchart TB
-    audio["Paired ground-truth and generated audio"] --> features["IPD and ILD extraction"]
-    audio --> bat["BAT spatial embeddings"]
-    features --> metrics["MAE and cosine similarities"]
-    bat --> metrics
-```
 
 ## Quick start
 
@@ -92,13 +90,9 @@ The default `--mae-normalization mean` averages the aligned time-frequency eleme
 The paper introduces a Multimodal Pose Encoder and an Immersive Drama Transformer for binaural speech generation. The released MRSDrama data contains recorded drama, scripts, aligned annotations, video, poses, and prompts. See the [paper](https://arxiv.org/abs/2504.20630) for the generation architecture and model comparisons, and the [evaluation guide](docs/evaluation.md) for this repository's tools.
 
 <details>
-<summary>Release history and authors</summary>
+<summary>Release history</summary>
 
 - July 2025: released MRSDrama data and evaluation code; accepted to ACM Multimedia 2025.
-
-Yu Zhang*, Wenxiang Guo*, Changhao Pan*, Zhiyuan Zhu*, Tao Jin, Zhou Zhao | Zhejiang University
-
-[语音之家](https://mp.weixin.qq.com/s/jrKT16zH115ZDYxa0b492w) · [PaperWeekly](https://mp.weixin.qq.com/s/ZIC8rHDkwsKwcBwEi4v4DQ) · [知乎](https://zhuanlan.zhihu.com/p/1930597017840779306)
 
 </details>
 
