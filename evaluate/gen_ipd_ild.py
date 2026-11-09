@@ -89,7 +89,7 @@ def extract_feature(audio_path, output_dir):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / (Path(audio_path).stem + '_feature.npy')
-    np.save(output_path, {'IPD': IPD_mel, 'ILD': ILD_mel})
+    np.save(output_path, np.stack((IPD_mel, ILD_mel)), allow_pickle=False)
     
     return IPD_mel, ILD_mel
 
@@ -99,7 +99,8 @@ if __name__ == "__main__":
     parser.add_argument('--output-dir', type=str, default='./features', help='Directory to save extracted features.')
     args = parser.parse_args()
     audio_dir = args.audio_dir
-    audio_files = sorted(glob.glob(os.path.join(audio_dir, "*.wav")))
+    audio_files = sorted(path for path in glob.glob(os.path.join(audio_dir, "*.wav"))
+                         if os.path.isfile(path))
     if not audio_files:
         parser.error(f"No WAV files found in {audio_dir}")
     for audio_file in tqdm.tqdm(audio_files,desc='extarcting ipd and ild'):

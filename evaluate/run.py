@@ -3,6 +3,7 @@
 import argparse
 from pathlib import Path
 import subprocess
+import shutil
 import sys
 
 
@@ -26,38 +27,42 @@ def main():
         parser.error(f"Checkpoint does not exist: {args.checkpoint}")
 
     output_root = args.output_dir.resolve()
+    try:
+        output_root.mkdir(parents=True, exist_ok=False)
+    except FileExistsError:
+        parser.error(f"Output directory already exists: {output_root}. Choose a fresh --output-dir.")
     outputs = {kind: output_root / kind / "npy" for kind in ("gt", "infer")}
-    for output_dir in outputs.values():
-        if any(output_dir.glob("*.npy")):
-            parser.error(f"Feature directory is not empty: {output_dir}. Choose a fresh --output-dir.")
-
-    for kind, audio_dir in (("gt", gt_dir), ("infer", pred_dir)):
-        output_dir = outputs[kind]
-        output_dir.mkdir(parents=True, exist_ok=True)
-        if not args.skip_embeddings:
+    try:
+        for kind, audio_dir in (("gt", gt_dir), ("infer", pred_dir)):
+            output_dir = outputs[kind]
+            output_dir.mkdir(parents=True, exist_ok=True)
+            if not args.skip_embeddings:
+                subprocess.run([
+                    sys.executable, str(root / "main.py"),
+                    "--model", "build_EVA", "--dataset", "mrsaudio",
+                    "--audio_path_root", str(audio_dir),
+                    "--output_dir", str(output_dir),
+                    "--finetune", str(args.checkpoint.resolve()),
+                    "--device", args.device, "--nb_classes", "355",
+                    "--batch_size", "32", "--num_workers", "4",
+                    "--audio_normalize", "--eval",
+                ], cwd=root, check=True)
             subprocess.run([
-                sys.executable, str(root / "main.py"),
-                "--model", "build_EVA", "--dataset", "mrsaudio",
-                "--audio_path_root", str(audio_dir),
-                "--output_dir", str(output_dir),
-                "--finetune", str(args.checkpoint.resolve()),
-                "--device", args.device, "--nb_classes", "355",
-                "--batch_size", "32", "--num_workers", "4",
-                "--audio_normalize", "--eval",
+                sys.executable, str(root / "evaluate/gen_ipd_ild.py"),
+                "--audio-dir", str(audio_dir), "--output-dir", str(output_dir),
             ], cwd=root, check=True)
-        subprocess.run([
-            sys.executable, str(root / "evaluate/gen_ipd_ild.py"),
-            "--audio-dir", str(audio_dir), "--output-dir", str(output_dir),
-        ], cwd=root, check=True)
 
-    command = [
-        sys.executable, str(root / "evaluate/evaluate.py"),
-        "--gt-dir", str(outputs["gt"]), "--pred-dir", str(outputs["infer"]),
-        "--mae-normalization", args.mae_normalization,
-    ]
-    if args.skip_embeddings:
-        command.append("--skip-embeddings")
-    subprocess.run(command, cwd=root, check=True)
+        command = [
+            sys.executable, str(root / "evaluate/evaluate.py"),
+            "--gt-dir", str(outputs["gt"]), "--pred-dir", str(outputs["infer"]),
+            "--mae-normalization", args.mae_normalization,
+        ]
+        if args.skip_embeddings:
+            command.append("--skip-embeddings")
+        subprocess.run(command, cwd=root, check=True)
+    except BaseException:
+        shutil.rmtree(output_root)
+        raise
 
 
 if __name__ == "__main__":

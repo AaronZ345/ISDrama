@@ -291,7 +291,14 @@ class BinauralEvaDataset(Dataset):
         ):
 
         self.audio_path_root = audio_path_root
-        self.data = os.listdir(audio_path_root)
+        self.data = sorted(name for name in os.listdir(audio_path_root)
+                           if name.endswith(_ext_audio) and os.path.isfile(os.path.join(audio_path_root, name)))
+        self.nested_layout = not self.data
+        if self.nested_layout:
+            self.data = sorted(os.path.join(name, 'binaural.wav') for name in os.listdir(audio_path_root)
+                               if os.path.isfile(os.path.join(audio_path_root, name, 'binaural.wav')))
+        if not self.data:
+            raise ValueError(f"No audio files found in {audio_path_root}")
 
         self.channel_num = 2 if audio_type == 'binaural' else 9 if audio_type == 'ambisonics' else 1
         
@@ -315,10 +322,7 @@ class BinauralEvaDataset(Dataset):
             tuple: Processed waveform, metric, audio_path.
         """
         datum = self.data[index]
-        if 'testset' in self.audio_path_root:
-            audio_path = os.path.join(self.audio_path_root, datum, 'binaural.wav')
-        else:
-            audio_path = os.path.join(self.audio_path_root, datum)
+        audio_path = os.path.join(self.audio_path_root, datum)
 
         try:
             waveform, sr = sf.read(audio_path)

@@ -10,16 +10,15 @@ def read_IPD_ILD_from_npy(npy_path):
     Read IPD and ILD matrices from a .npy file.
 
     Args:
-        npy_path (str): Path to a .npy file storing a dict with keys 'IPD' and 'ILD'.
+        npy_path (str): Path to a numeric .npy array with shape (2, time, mel).
 
     Returns:
         (IPD_mel, ILD_mel): Tuple containing two 2D numpy arrays.
     """
-    data = np.load(npy_path, allow_pickle=True)
-    data_dict = data.item()
-    IPD_mel = data_dict['IPD']
-    ILD_mel = data_dict['ILD']
-    return IPD_mel, ILD_mel
+    data = np.load(npy_path, allow_pickle=False)
+    if data.ndim != 3 or data.shape[0] != 2:
+        raise ValueError(f"Expected numeric IPD/ILD features with shape (2, time, mel): {npy_path}")
+    return data[0], data[1]
 
 
 def calculate_mae(matrix_a, matrix_b):
@@ -159,6 +158,11 @@ def main():
     feature_pairs = paired_files(args.gt_dir, args.pred_dir, "_feature.npy")
     dis_pairs = [] if args.skip_embeddings else paired_files(args.gt_dir, args.pred_dir, "_dis.npy")
     azi_pairs = [] if args.skip_embeddings else paired_files(args.gt_dir, args.pred_dir, "_azi.npy")
+    if not args.skip_embeddings:
+        names = {gt.name[:-len("_feature.npy")] for gt, _ in feature_pairs}
+        for pairs, suffix in ((dis_pairs, "_dis.npy"), (azi_pairs, "_azi.npy")):
+            if {gt.name[:-len(suffix)] for gt, _ in pairs} != names:
+                raise ValueError(f"{suffix} embeddings must cover the same audio items as IPD/ILD features")
 
     IPD_MAE_LIST = []
     ILD_MAE_LIST = []
@@ -186,14 +190,14 @@ def main():
     azi_scores = []
 
     for gt_dis_npy_file, pred_dis_npy_file in tqdm.tqdm(dis_pairs, desc='evaluate distance cos'):
-        gt_dis_tokens = np.load(gt_dis_npy_file, allow_pickle=True)
-        pred_dis_tokens = np.load(pred_dis_npy_file, allow_pickle=True)
+        gt_dis_tokens = np.load(gt_dis_npy_file, allow_pickle=False)
+        pred_dis_tokens = np.load(pred_dis_npy_file, allow_pickle=False)
         dis_score = matrix_cosine_similarity(gt_dis_tokens, pred_dis_tokens)
         dis_scores.append(dis_score)
 
     for gt_azi_npy_file, pred_azi_npy_file in tqdm.tqdm(azi_pairs, desc='evaluate azimuth cos'):
-        gt_azi_tokens = np.load(gt_azi_npy_file, allow_pickle=True)
-        pred_azi_tokens = np.load(pred_azi_npy_file, allow_pickle=True)
+        gt_azi_tokens = np.load(gt_azi_npy_file, allow_pickle=False)
+        pred_azi_tokens = np.load(pred_azi_npy_file, allow_pickle=False)
         azi_score = matrix_cosine_similarity(gt_azi_tokens, pred_azi_tokens)
         azi_scores.append(azi_score)
 
