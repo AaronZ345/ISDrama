@@ -1,7 +1,7 @@
-import os
-import glob
 import numpy as np
 import tqdm
+import argparse
+from pathlib import Path
 
 # Read IPD and ILD from .npy files
 
@@ -38,6 +38,10 @@ def calculate_mae(matrix_a, matrix_b):
     """
     a = np.asarray(matrix_a)
     b = np.asarray(matrix_b)
+    if a.ndim != 2 or b.ndim != 2 or not a.size or not b.size:
+        raise ValueError("MAE requires nonempty two-dimensional feature arrays")
+    if not np.isfinite(a).all() or not np.isfinite(b).all():
+        raise ValueError("MAE features must contain only finite values")
 
     min_rows = min(a.shape[0], b.shape[0])
     min_cols = min(a.shape[1], b.shape[1])
@@ -48,9 +52,14 @@ def calculate_mae(matrix_a, matrix_b):
     return np.mean(np.abs(a_trunc - b_trunc))
 
 
-def calculate_mae_time(matrix_a, matrix_b):
+def calculate_mae_time(matrix_a, matrix_b, normalization="mean"):
+    """Compute elementwise MAE; legacy reproduces the old extra frame division."""
     mae_value = calculate_mae(matrix_a, matrix_b)
-    return mae_value / min(np.asarray(matrix_a).shape[0], np.asarray(matrix_b).shape[0])
+    if normalization == "legacy":
+        return mae_value / min(np.asarray(matrix_a).shape[0], np.asarray(matrix_b).shape[0])
+    if normalization != "mean":
+        raise ValueError(f"Unknown MAE normalization: {normalization}")
+    return mae_value
 
 
 def matrix_cosine_similarity(matrix_a, matrix_b, epsilon=1e-8):
@@ -127,46 +136,62 @@ def frequency_band_similarity(matrix_a, matrix_b, sr=16000, n_fft=512):
     return total_score / sum(weights)
 
 
-if __name__ == "__main__":
-    audio_dir = "./outputs/infer/npy"
-    feature_npy_files = sorted(glob.glob(os.path.join(audio_dir, "*_feature.npy")))
+def paired_files(gt_dir, pred_dir, suffix):
+    gt_files = {path.name: path for path in Path(gt_dir).glob(f"*{suffix}")}
+    pred_files = {path.name: path for path in Path(pred_dir).glob(f"*{suffix}")}
+    if not gt_files or gt_files.keys() != pred_files.keys():
+        missing = sorted(gt_files.keys() - pred_files.keys())
+        extra = sorted(pred_files.keys() - gt_files.keys())
+        raise ValueError(
+            f"Expected nonempty matching {suffix} files; missing predictions: {missing}; "
+            f"extra predictions: {extra}"
+        )
+    return [(gt_files[name], pred_files[name]) for name in sorted(gt_files)]
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Evaluate paired spatial audio features.")
+    parser.add_argument("--gt-dir", default="./outputs/gt/npy")
+    parser.add_argument("--pred-dir", default="./outputs/infer/npy")
+    parser.add_argument("--mae-normalization", choices=("mean", "legacy"), default="mean")
+    parser.add_argument("--skip-embeddings", action="store_true", help="Evaluate IPD/ILD only.")
+    args = parser.parse_args()
+    feature_pairs = paired_files(args.gt_dir, args.pred_dir, "_feature.npy")
+    dis_pairs = [] if args.skip_embeddings else paired_files(args.gt_dir, args.pred_dir, "_dis.npy")
+    azi_pairs = [] if args.skip_embeddings else paired_files(args.gt_dir, args.pred_dir, "_azi.npy")
 
     IPD_MAE_LIST = []
     ILD_MAE_LIST = []
 
     # Compute IPD and ILD MAE
-    for pred_npy_file in tqdm.tqdm(feature_npy_files, desc='evaluate IPD and ILD'):
-        gt_npy_file = pred_npy_file.replace('outputs/infer', 'outputs/gt')
+    for gt_npy_file, pred_npy_file in tqdm.tqdm(feature_pairs, desc='evaluate IPD and ILD'):
         gt_IPD, gt_ILD = read_IPD_ILD_from_npy(gt_npy_file)
         pred_IPD, pred_ILD = read_IPD_ILD_from_npy(pred_npy_file)
-        IPD_mae = calculate_mae_time(gt_IPD, pred_IPD)
-        ILD_mae = calculate_mae_time(gt_ILD, pred_ILD)
+        IPD_mae = calculate_mae_time(gt_IPD, pred_IPD, args.mae_normalization)
+        ILD_mae = calculate_mae_time(gt_ILD, pred_ILD, args.mae_normalization)
         IPD_MAE_LIST.append(IPD_mae)
         ILD_MAE_LIST.append(ILD_mae)
 
     ipd_mae_loss = round(sum(IPD_MAE_LIST) / len(IPD_MAE_LIST) * 100, 4)
     ild_mae_loss = round(sum(ILD_MAE_LIST) / len(ILD_MAE_LIST) * 100, 4)
 
+    print(f'MAE normalization: {args.mae_normalization}')
     print(f'IPD mae(x100): {ipd_mae_loss}')
     print(f'ILD mae(x100): {ild_mae_loss}')
+    if args.skip_embeddings:
+        return
 
     # Compute distance and azimuth cosine similarity
     dis_scores = []
     azi_scores = []
 
-    dis_npy_files = sorted(glob.glob(os.path.join(audio_dir, "*_dis.npy")))
-    for pred_dis_npy_file in tqdm.tqdm(dis_npy_files, desc='evaluate distance cos'):
-        gt_dis_npy_file = pred_dis_npy_file.replace('outputs/infer', 'outputs/gt')
-        assert os.path.exists(gt_dis_npy_file), f"Ground truth file {gt_dis_npy_file} does not exist."
+    for gt_dis_npy_file, pred_dis_npy_file in tqdm.tqdm(dis_pairs, desc='evaluate distance cos'):
         gt_dis_tokens = np.load(gt_dis_npy_file, allow_pickle=True)
         pred_dis_tokens = np.load(pred_dis_npy_file, allow_pickle=True)
         dis_score = matrix_cosine_similarity(gt_dis_tokens, pred_dis_tokens)
         dis_scores.append(dis_score)
 
-    azi_npy_files = sorted(glob.glob(os.path.join(audio_dir, "*_azi.npy")))
-    for pred_azi_npy_file in tqdm.tqdm(azi_npy_files, desc='evaluate azimuth cos'):
-        gt_azi_npy_file = pred_azi_npy_file.replace('outputs/infer', 'outputs/gt')
-        assert os.path.exists(gt_azi_npy_file), f"Ground truth file {gt_azi_npy_file} does not exist."
+    for gt_azi_npy_file, pred_azi_npy_file in tqdm.tqdm(azi_pairs, desc='evaluate azimuth cos'):
         gt_azi_tokens = np.load(gt_azi_npy_file, allow_pickle=True)
         pred_azi_tokens = np.load(pred_azi_npy_file, allow_pickle=True)
         azi_score = matrix_cosine_similarity(gt_azi_tokens, pred_azi_tokens)
@@ -177,3 +202,7 @@ if __name__ == "__main__":
 
     print(f"dis Cosine Similarity: {dis_cos:.4f} (-1~1 scale)")
     print(f"azi Cosine Similarity: {azi_cos:.4f} (-1~1 scale)")
+
+
+if __name__ == "__main__":
+    main()

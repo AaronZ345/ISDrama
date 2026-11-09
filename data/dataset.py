@@ -14,8 +14,6 @@ import torch
 import torch.distributed as dist
 import torch.nn.functional as F
 from torch.utils.data import Dataset, Sampler, DistributedSampler, WeightedRandomSampler
-import pandas as pd
-import cv2
 import glob
 from scipy.interpolate import interp1d
 
@@ -350,4 +348,3 @@ class BinauralEvaDataset(Dataset):
         waveforms, audio_path = zip(*batch)
         waveforms = torch.stack(waveforms)
         return waveforms, audio_path
-            

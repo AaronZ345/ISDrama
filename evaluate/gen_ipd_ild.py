@@ -11,6 +11,7 @@ from utils.stft import STFT, LogmelFilterBank
 import tqdm
 
 import argparse
+from pathlib import Path
 
 def resample_audio(waveform, orig_sr, target_sr=32000):
     """Resample audio waveform to a target sample rate."""
@@ -85,8 +86,9 @@ def extract_feature(audio_path, output_dir):
     # print(f"Final features shape: IPD {IPD_mel.shape}, ILD {ILD_mel.shape}")
     
     # Save the features to a .npy file
-    audio_dir = os.path.dirname(audio_path)
-    output_path = audio_path.replace('.wav', '_feature.npy').replace(audio_dir, output_dir)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = output_dir / (Path(audio_path).stem + '_feature.npy')
     np.save(output_path, {'IPD': IPD_mel, 'ILD': ILD_mel})
     
     return IPD_mel, ILD_mel
@@ -98,5 +100,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     audio_dir = args.audio_dir
     audio_files = sorted(glob.glob(os.path.join(audio_dir, "*.wav")))
+    if not audio_files:
+        parser.error(f"No WAV files found in {audio_dir}")
     for audio_file in tqdm.tqdm(audio_files,desc='extarcting ipd and ild'):
-        extract_feature(audio_file)
+        extract_feature(audio_file, args.output_dir)
