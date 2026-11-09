@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="169" height="26" viewBox="0 0 169 26">
+  <title>ACM Multimedia 2025</title>
+  <!-- Conference mark source: https://acmmm2025.org/wp-content/uploads/2023/10/cropped-favicon-192x192.png -->
+  <style>
+    text { fill: #60427a }
+    @media (prefers-color-scheme: dark) { text { fill: #d9b8f1 } }
+  </style>
+  <text x="4" y="13" dominant-baseline="central" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="15" font-weight="650">ACM Multimedia 2025</text>
+</svg>
