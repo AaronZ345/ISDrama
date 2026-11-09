@@ -1,172 +1,106 @@
-#  ISDrama: Immersive Spatial Drama Generation through Multimodal Prompting
+<div align="center">
 
-#### Yu Zhang*, Wenxiang Guo*, Changhao Pan*, Zhiyuan Zhu*, Tao Jin, Zhou Zhao | Zhejiang University
+# ISDrama
 
-Dataset and evaluation code of [ISDrama (ACM-MM 2025)](https://arxiv.org/abs/2504.20630): Immersive Spatial Drama Generation through Multimodal Prompting.
+**Immersive spatial drama generation through multimodal prompting**
 
-[![arXiv](https://img.shields.io/badge/arXiv-Paper-<COLOR>.svg)](https://arxiv.org/abs/2504.20630) 
-[![Demo](https://img.shields.io/badge/🚀%20Demo%20Page-blue)](https://aaronz345.github.io/ISDramaDemo)
-[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue?label=Dataset)](https://huggingface.co/datasets/AaronZ345/MRSDrama)
-[![weixin](https://img.shields.io/badge/-WeChat@语音之家-000000?logo=wechat&logoColor=07C160)](https://mp.weixin.qq.com/s/jrKT16zH115ZDYxa0b492w)
-[![weixin](https://img.shields.io/badge/-WeChat@PaperWeekly-000000?logo=wechat&logoColor=07C160)](https://mp.weixin.qq.com/s/ZIC8rHDkwsKwcBwEi4v4DQ)
-[![zhihu](https://img.shields.io/badge/-知乎-000000?logo=zhihu&logoColor=0084FF)](https://zhuanlan.zhihu.com/p/1930597017840779306)
-[![Google Drive](https://img.shields.io/badge/Google%20Drive-Link-blue?logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1ALpnOD4b_zgn8GSu4aS-cjdDK8vY6Lyy?usp=sharing)
-[![GitHub Stars](https://img.shields.io/github/stars/AaronZ345/ISDrama?style=social&label=GitHub+Stars)](https://github.com/AaronZ345/ISDrama)
+[ACM Multimedia 2025](https://arxiv.org/abs/2504.20630)
 
-We construct MRSDrama, the first multimodal recorded spatial drama dataset, containing binaural drama audios, scripts, videos, geometric poses, and textual prompts.
-Then, we propose ISDrama, the first immersive spatial drama generation model through multimodal prompting.
+[![Paper](https://img.shields.io/badge/Paper-arXiv-b31b1b?style=flat-square)](https://arxiv.org/abs/2504.20630) [![Dataset](https://img.shields.io/badge/Dataset-Hugging%20Face-ffd21e?style=flat-square)](https://huggingface.co/datasets/AaronZ345/MRSDrama) [![Demo](https://img.shields.io/badge/Demo-Samples-2563eb?style=flat-square)](https://aaronz345.github.io/ISDramaDemo) [![Stars](https://img.shields.io/github/stars/AaronZ345/ISDrama?style=flat-square)](https://github.com/AaronZ345/ISDrama)
 
-We provide the **evaluation code** in this repository. 
+[Quick start](#quick-start) · [Training datasets](#training-datasets) · [Data format](docs/data-format.md) · [Evaluation](docs/evaluation.md) · [Citation](#citations)
 
-Moreover, you can visit our [Demo Page](https://aaronz345.github.io/ISDramaDemo) for the audio samples of our dataset as well as the results of our model.
+</div>
 
-## Updates
+ISDrama introduces multimodal spatial drama generation and the MRSDrama recorded dataset. **This repository provides dataset access and spatial evaluation tools.** MRSDrama and MRSAudio are publicly released training resources for spatial audio generation and understanding.
 
-- 2025.07: We released the evaluation code of MRSDrama!
-- 2025.07: We released the full dataset of MRSDrama!
-- 2025.07: ISDrama is accepted by ACMMM 2025!
+| Resource | Available here |
+| --- | --- |
+| Training data | MRSDrama and MRSAudio download links |
+| Evaluation | Paired spatial audio feature extraction and metrics |
+| Encoder | Published BAT checkpoint, verified before loading |
+| Runtime | Python 3.8 to 3.10; PyTorch 2.0.1; CPU or an existing CUDA device |
 
-## Key Features
+```mermaid
+flowchart TB
+    audio["Paired ground-truth and generated audio"] --> features["IPD and ILD extraction"]
+    audio --> bat["BAT spatial embeddings"]
+    features --> metrics["MAE and cosine similarities"]
+    bat --> metrics
+```
 
-- We develop MRSDrama, the first **multimodal recorded spatial drama dataset**, accompanying videos, scripts, alignments, positions, and textual prompts.
-- We introduce ISDrama, the first **immersive spatial drama generation model through multimodal prompting**. We design the **Multimodal Pose Encoder** to extract pose from multimodal inputs, while the **Immersive Drama Transformer** produces binaural speech.
-- Experimental results show that ISDrama outperforms baseline models on objective and subjective metrics.
+## Quick start
 
-## Training datasets
-
-MRSDrama and MRSAudio are both publicly released training data resources for spatial audio generation and understanding:
-
-| Dataset | Training data | Download |
-| --- | --- | --- |
-| MRSDrama | Recorded binaural drama, scripts, video, geometric poses, and textual prompts | [Hugging Face](https://huggingface.co/datasets/AaronZ345/MRSDrama) |
-| MRSAudio | MRSLife, MRSSpeech, MRSSing, and MRSMusic, with spatial recordings and multimodal annotations | [Hugging Face](https://huggingface.co/datasets/MRSAudio/MRSAudio) · [Project](https://mrsaudio.github.io) |
-
-Prepare the selected dataset for your model's training pipeline and follow its own data card and license. This repository contains the ISDrama evaluation tools; the paired audio directories used by those tools are described separately below.
-
-### Where to download
-
-Click [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue?label=Dataset)](https://huggingface.co/datasets/AaronZ345/MRSDrama) to access our **full dataset** (videos, scripts, alignments, positions, and textual prompts) on Hugging Face **for free**! Hope our data is helpful for your research.
-
-Besides, we also provide our dataset on [![Google Drive](https://img.shields.io/badge/Google%20Drive-Link-blue?logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1ALpnOD4b_zgn8GSu4aS-cjdDK8vY6Lyy?usp=sharing).
-
-**Please note that, if you are using MRSDrama, it means that you have accepted the terms of [license](https://github.com/AaronZ345/ISDrama/blob/master/dataset_license.md).**
-
-### Data Architecture
-
-Our dataset is organized hierarchically. 
-
-Each top-level folder contains a set of dramas. Each folder contains a subfolder with cut WAV files, an MP4 video file, and a JSON file containing all annotation information. 
-Additionally, the geometric_pose subdirectory stores NumPy (.npy) sequences—listener‑centric 3D positions, head-orientation quaternions, and radial velocities with respect to the left and right ears. These sequences are aligned at the frame level and generated with a 48 kHz sample rate and a 256-sample hop size.
-
-## Evaluation of ISDrama
-
-> The evaluation process is based on the code and models of "BAT: Learning to Reason about Spatial Sounds with Large Language Models" .
-
-### Dependencies
-
-A suitable [conda](https://conda.io/) environment named `isdrama_eva` can be created
-and activated with:
+### 1. Install the environment
 
 ```bash
+git clone https://github.com/AaronZ345/ISDrama.git
+cd ISDrama
 conda env create -f environment.yml
 conda activate isdrama_eva
 bash timm_patch/patch.sh
 ```
 
-## Preparation
+### 2. Prepare the encoder and paired audio
 
-### Checkpoint Preparation
+Download the published [BAT checkpoint](https://huggingface.co/datasets/zhisheng01/SpatialAudio/blob/main/SpatialAST/finetuned.pth) to `ckpt/finetuned.pth`. Its SHA-256 is checked before a private copy is loaded; custom or modified checkpoints are rejected.
 
-Please download the finetuned `BAT` encoder [checkpoint](https://huggingface.co/datasets/zhisheng01/SpatialAudio/blob/main/SpatialAST/finetuned.pth) and place it at:
+Place ground-truth WAV files in `data/gt` and generated WAV files in `data/infer` with identical filenames. Each file must be stereo. Choose an output directory that does not exist.
 
-```bash
-./ckpt/finetuned.pth
-```
-Make sure the path exists (create the `ckpt` directory if necessary).
-The evaluator verifies the published checkpoint's SHA-256 before deserializing a private copy. Custom or modified checkpoint files are rejected.
-
-### Data Preparation
-
-For evaluation, you must prepare paired ground‑truth audio and generated audio.
-Place them respectively in:
-
-```bash
-./data/gt
-./data/infer
-```
-The expected directory layout is:
-
-```yaml
-.
-├── gt
-│   ├── 0000.wav
-│   ├── 0001.wav
-│   ├── 0002.wav
-│   └── 0003.wav
-└── infer
-    ├── 0000.wav
-    ├── 0001.wav
-    ├── 0002.wav
-    └── 0003.wav
-```
-
-Important:
-
-- The files inside gt and infer must correspond one‑to‑one.
-- Filenames and counts must match exactly (e.g., `gt/0002.wav` pairs with `infer/0002.wav`).
-- Ensure sampling rates and channel configurations are consistent if required by downstream metrics.
-
-## Metrics
-
-### Semantic & Acoustic Metrics
-- **Character Error Rate (CER)**: Assesses transcript/content accuracy.
-- **Cosine Similarity (SIM)**: Measures speaker timbre similarity between the generated audio and the prompt/reference audio (e.g., via speaker embeddings).
-- **F0 Frame Error (FFE)**: Evaluates prosody fidelity by comparing voiced/unvoiced decisions and pitch (F0) frames.
-
-### Spatial Metrics
-- **IPD MAE**: Mean Absolute Error between ground‑truth and generated Interaural Phase Differences.
-- **ILD MAE**: Mean Absolute Error between ground‑truth and generated Interaural Level Differences.
-- **Angle Cosine Similarity (ANG Cos)**: Cosine similarity between ground‑truth and generated direction (azimuth / elevation) angle embeddings.
-- **Distance Cosine Similarity (Dis Cos)**: Cosine similarity between ground‑truth and generated distance embeddings.
-
-> **Note:** Cosine‑based spatial scores are in the range \[-1, 1\], with higher values indicating closer alignment of spatial embeddings.
-
-## Running the Evaluation
-
-Run the following script to perform the evaluation pipeline:
+### 3. Run spatial evaluation
 
 ```bash
 bash evaluate/eval.sh --gt-dir data/gt --pred-dir data/infer \
-  --checkpoint ckpt/finetuned.pth --output-dir outputs/run-1
+  --checkpoint ckpt/finetuned.pth --output-dir outputs/run-1 --device cpu
 ```
 
-The script evaluate/eval.sh executes the following three stages:
+The runner extracts BAT embeddings and IPD/ILD features, then reports mean absolute errors and distance/azimuth cosine similarities. It reserves the output directory and removes partial output if a stage fails. For CUDA, use `--device cuda` and select an existing GPU with `CUDA_VISIBLE_DEVICES`.
 
-1. Extract angle and distance embeddings using the BAT encoder.
-
-2. Extract IPD & ILD features from paired ground‑truth and generated stereo audio.
-
-3. Compute metrics: MAE (for IPD / ILD) and cosine similarities (for angle and distance).
-
-The runner requires matching, nonempty WAV filename sets and an output directory that does not already exist. It reserves that directory before extraction and removes its partial output if a stage fails. Use `--device cpu` for CPU embedding extraction, or set `CUDA_VISIBLE_DEVICES` before the command to select an existing GPU. The BAT preprocessing profile is fixed by the encoder; it does not select or load a training dataset.
-
-To calculate IPD and ILD without the BAT checkpoint:
+To evaluate IPD and ILD without the encoder checkpoint:
 
 ```bash
 bash evaluate/eval.sh --gt-dir data/gt --pred-dir data/infer \
   --output-dir outputs/ipd-ild-run-1 --skip-embeddings
 ```
 
-The default `--mae-normalization mean` computes the mean absolute error once over aligned time-frequency elements, then multiplies the printed score by 100. It corrects the previous extra division by frame count. Scores from this version should be labeled `mean`; use `--mae-normalization legacy` to reproduce the former normalization when comparing historical runs. Both modes retain the existing feature extraction and alignment convention.
+See the [evaluation guide](docs/evaluation.md) for metric definitions, numeric feature files, historical normalization, and evaluation of existing features.
 
-Existing features can be evaluated independently:
+## Training datasets
 
-New feature files contain numeric arrays with shape `(2, time, mel)`, ordered as IPD then ILD. Regenerate older pickled dictionary feature files with the updated extractor; object arrays are no longer loaded. All requested metrics must cover the same audio items.
+| Dataset | Training resources | Access |
+| --- | --- | --- |
+| MRSDrama | Binaural drama, scripts, video, geometric poses, and text prompts | [Hugging Face](https://huggingface.co/datasets/AaronZ345/MRSDrama) · [Google Drive](https://drive.google.com/drive/folders/1ALpnOD4b_zgn8GSu4aS-cjdDK8vY6Lyy?usp=sharing) |
+| MRSAudio | MRSLife, MRSSpeech, MRSSing, and MRSMusic with spatial recordings and multimodal annotations | [Hugging Face](https://huggingface.co/datasets/MRSAudio/MRSAudio) · [Project](https://mrsaudio.github.io) |
 
-```bash
-python evaluate/evaluate.py --gt-dir outputs/run-1/gt/npy \
-  --pred-dir outputs/run-1/infer/npy --mae-normalization mean
-```
+Prepare either dataset for your model's training pipeline and follow its own data card and license. The paired ground-truth/generated directories above are evaluation inputs. The encoder's BAT preprocessing profile does not select a training dataset.
+
+Using MRSDrama means accepting its [dataset license](dataset_license.md). Its [data-format guide](docs/data-format.md) describes recordings, annotations, and listener-centric geometric sequences.
+
+## Evaluation outputs
+
+| Score | Definition |
+| --- | --- |
+| IPD MAE | Error between aligned interaural phase-difference features |
+| ILD MAE | Error between aligned interaural level-difference features |
+| Distance cosine similarity | Similarity between BAT distance embeddings |
+| Azimuth cosine similarity | Similarity between BAT direction embeddings |
+
+The default `--mae-normalization mean` averages the aligned time-frequency elements once and prints MAE multiplied by 100. Use `--mae-normalization legacy` only when reproducing the former extra frame-count division. Label the normalization in comparisons. All requested metric families must cover the same audio items; feature files use numeric arrays and are loaded without pickle.
+
+## Method and data
+
+The paper introduces a Multimodal Pose Encoder and an Immersive Drama Transformer for binaural speech generation. The released MRSDrama data contains recorded drama, scripts, aligned annotations, video, poses, and prompts. See the [paper](https://arxiv.org/abs/2504.20630) for the generation architecture and model comparisons, and the [evaluation guide](docs/evaluation.md) for this repository's tools.
+
+<details>
+<summary>Release history and authors</summary>
+
+- July 2025: released MRSDrama data and evaluation code; accepted to ACM Multimedia 2025.
+
+Yu Zhang*, Wenxiang Guo*, Changhao Pan*, Zhiyuan Zhu*, Tao Jin, Zhou Zhao | Zhejiang University
+
+[语音之家](https://mp.weixin.qq.com/s/jrKT16zH115ZDYxa0b492w) · [PaperWeekly](https://mp.weixin.qq.com/s/ZIC8rHDkwsKwcBwEi4v4DQ) · [知乎](https://zhuanlan.zhihu.com/p/1930597017840779306)
+
+</details>
 
 ## Citations ##
 
@@ -183,5 +117,3 @@ If you find this code useful in your research, please cite our work:
 ## Disclaimer ##
 
 Any organization or individual is prohibited from using any technology mentioned in this paper to generate someone's speech without his/her consent, including but not limited to government leaders, political figures, and celebrities. If you do not comply with this item, you could be in violation of copyright laws.
-
- ![visitors](https://visitor-badge.laobi.icu/badge?page_id=AaronZ345/ISDrama)
